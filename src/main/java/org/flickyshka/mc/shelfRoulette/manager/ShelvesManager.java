@@ -20,11 +20,16 @@ import org.bukkit.entity.Display;
 import org.bukkit.Color;
 import org.bukkit.util.EulerAngle;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class ShelvesManager {
+public class ShelvesManager implements Listener {
 
     private final ShelfRoulette plugin;
     private File file;
@@ -35,6 +40,7 @@ public class ShelvesManager {
         this.plugin = plugin;
         setup();
         load();
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     private void setup() {
@@ -396,6 +402,10 @@ public class ShelvesManager {
 
         for (Location loc : registeredShelves.keySet()) {
             if (processed.contains(loc)) continue;
+            
+            if (loc.getWorld() == null || !loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
+                continue;
+            }
 
             Block block = loc.getBlock();
             if (block.getState() instanceof Shelf) {
@@ -595,6 +605,11 @@ public class ShelvesManager {
                     idleHolograms.put(blockLoc, idleStands);
                 }
             }
+            
+            // Если игра активна, скрываем свежесозданные голограммы
+            if (plugin.getActiveGameAt(blockLoc) != null) {
+                setIdleHologramVisible(blockLoc, false);
+            }
         }
     }
 
@@ -606,5 +621,42 @@ public class ShelvesManager {
         }
         spawnedArrows.clear();
         idleHolograms.clear();
+    }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        org.bukkit.Chunk chunk = event.getChunk();
+        boolean hasShelf = false;
+        for (Location loc : registeredShelves.keySet()) {
+            if (loc.getWorld() != null && loc.getWorld().equals(chunk.getWorld()) && 
+                (loc.getBlockX() >> 4) == chunk.getX() && 
+                (loc.getBlockZ() >> 4) == chunk.getZ()) {
+                hasShelf = true;
+                break;
+            }
+        }
+        if (hasShelf) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                updatePermanentArrows();
+            }, 10L);
+        }
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        org.bukkit.Chunk chunk = event.getChunk();
+        boolean hasShelf = false;
+        for (Location loc : registeredShelves.keySet()) {
+            if (loc.getWorld() != null && loc.getWorld().equals(chunk.getWorld()) && 
+                (loc.getBlockX() >> 4) == chunk.getX() && 
+                (loc.getBlockZ() >> 4) == chunk.getZ()) {
+                hasShelf = true;
+                break;
+            }
+        }
+        if (hasShelf) {
+            // Очищаем невалидные ентити чтобы не было утечек памяти
+            spawnedArrows.removeIf(stand -> !stand.isValid());
+        }
     }
 }

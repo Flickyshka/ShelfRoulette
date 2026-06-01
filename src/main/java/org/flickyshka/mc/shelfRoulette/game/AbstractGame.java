@@ -73,8 +73,6 @@ public abstract class AbstractGame extends BukkitRunnable {
         for (Block b : shelves) {
             plugin.getShelvesManager().setIdleHologramVisible(b.getLocation(), false);
         }
-        
-        initializeGame();
     }
 
     public boolean isDisplayingResult() {

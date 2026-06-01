@@ -13,6 +13,7 @@ public class SlotGame extends AbstractGame {
 
     public SlotGame(ShelfRoulette plugin, Player player, double betAmount, Block casinoBlock) {
         super(plugin, player, betAmount, casinoBlock);
+        initializeGame();
     }
 
     @Override

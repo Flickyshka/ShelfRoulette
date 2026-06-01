@@ -33,6 +33,7 @@ public abstract class AbstractGame extends BukkitRunnable {
     protected boolean displayingResult = false;
     protected ItemStack winningItem = null;
     protected Block middleBlock = null;
+    protected final java.util.List<org.bukkit.entity.Entity> hologramLines = new java.util.ArrayList<>();
 
     public AbstractGame(ShelfRoulette plugin, Player player, double betAmount, Block casinoBlock) {
         this.plugin = plugin;
@@ -110,13 +111,16 @@ public abstract class AbstractGame extends BukkitRunnable {
         for (Block b : shelves) {
             plugin.getShelvesManager().setIdleHologramVisible(b.getLocation(), true);
         }
+        removeHologram();
         plugin.getActiveGames().remove(casinoBlock.getLocation());
     }
 
     protected abstract void determineResult();
 
     protected void applyWinnings() {
+        removeHologram();
         if (winningItem == null) {
+            if (configManager.isLoseEnabled()) spawnHologram(configManager.getHologramLoseLines(player, betAmount), "lose");
             configManager.playSound(middleBlock.getLocation(), "lose", "ENTITY_VILLAGER_NO", 1.0f, 1.0f);
             String loseMsg = configManager.getMessage("lose").replace("{amount}", configManager.formatMoney(betAmount)).replace("{amount_commas}", configManager.formatMoneyCommas(betAmount));
             player.sendMessage(org.flickyshka.mc.shelfRoulette.util.ColorUtil.format(player, loseMsg));
@@ -127,14 +131,65 @@ public abstract class AbstractGame extends BukkitRunnable {
         double winAmount = betAmount * multiplier;
 
         if (winAmount > 0) {
+            if (configManager.isWinEnabled()) spawnHologram(configManager.getHologramWinLines(player, betAmount, winAmount), "win");
             plugin.getEconomyManager().deposit(player, winAmount);
             configManager.playSound(middleBlock.getLocation(), "win", "ENTITY_PLAYER_LEVELUP", 1.0f, 1.0f);
             String winMsg = configManager.getMessage("win").replace("{amount}", configManager.formatMoney(winAmount)).replace("{amount_commas}", configManager.formatMoneyCommas(winAmount));
             player.sendMessage(org.flickyshka.mc.shelfRoulette.util.ColorUtil.format(player, winMsg));
         } else {
+            if (configManager.isLoseEnabled()) spawnHologram(configManager.getHologramLoseLines(player, betAmount), "lose");
             configManager.playSound(middleBlock.getLocation(), "lose", "ENTITY_VILLAGER_NO", 1.0f, 1.0f);
             String loseMsg = configManager.getMessage("lose").replace("{amount}", configManager.formatMoney(betAmount)).replace("{amount_commas}", configManager.formatMoneyCommas(betAmount));
             player.sendMessage(org.flickyshka.mc.shelfRoulette.util.ColorUtil.format(player, loseMsg));
         }
     }
+    protected void spawnHologram(java.util.List<String> lines, String category) {
+        double gx = configManager.getGameOffsetX();
+        double gy = configManager.getGameOffsetY();
+        double gz = configManager.getGameOffsetZ();
+        Location baseLoc = middleBlock.getLocation().add(0.5 + gx, gy, 0.5 + gz);
+        baseLoc.setYaw(0.0f);
+        baseLoc.setPitch(0.0f);
+        double spacing = 0.25;
+
+        double yOffset = 0.1 + (lines.size() - 1) * spacing;
+        String type = configManager.getHologramType(category).toUpperCase();
+
+        for (String line : lines) {
+            Location lineLoc = baseLoc.clone().add(0, yOffset, 0);
+            lineLoc.setYaw(0.0f);
+            lineLoc.setPitch(0.0f);
+            
+            org.bukkit.entity.Entity stand = null;
+            if (type.equals("TEXT_DISPLAY")) {
+                stand = baseLoc.getWorld().spawn(lineLoc, org.bukkit.entity.TextDisplay.class, s -> {
+                    s.setPersistent(false);
+                    s.setText(line);
+                    s.setBillboard(org.bukkit.entity.Display.Billboard.CENTER);
+                    s.setBackgroundColor(org.bukkit.Color.fromARGB(0, 0, 0, 0));
+                    s.setShadowed(false);
+                });
+            } else {
+                stand = baseLoc.getWorld().spawn(lineLoc, org.bukkit.entity.ArmorStand.class, s -> {
+                    s.setPersistent(false);
+                    s.setCustomName(line);
+                    s.setCustomNameVisible(true);
+                    s.setInvisible(true);
+                    s.setMarker(true);
+                    s.setGravity(false);
+                    s.setBasePlate(false);
+                });
+            }
+            hologramLines.add(stand);
+            yOffset -= spacing;
+        }
+    }
+
+    protected void removeHologram() {
+        for (org.bukkit.entity.Entity stand : hologramLines) {
+            if (stand.isValid()) stand.remove();
+        }
+        hologramLines.clear();
+    }
 }
+

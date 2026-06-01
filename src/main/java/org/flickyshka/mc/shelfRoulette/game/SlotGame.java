@@ -37,6 +37,10 @@ public class SlotGame extends AbstractGame {
                 setItemAt(slot, randomItem);
             }
         }
+
+        if (configManager.isSpinningEnabled()) {
+            spawnHologram(configManager.getHologramSpinLines(player, betAmount), "spinning");
+        }
     }
 
     @Override

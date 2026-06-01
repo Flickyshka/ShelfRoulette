@@ -48,6 +48,10 @@ public class RouletteGame extends AbstractGame {
             int wheelIndex = (wheelOffset + slot) % rouletteWheel.size();
             setItemAt(slot, rouletteWheel.get(wheelIndex));
         }
+
+        if (configManager.isSpinningEnabled()) {
+            spawnHologram(configManager.getHologramSpinLines(player, betAmount), "spinning");
+        }
     }
 
     @Override

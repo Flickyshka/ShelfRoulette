@@ -1,5 +1,12 @@
 package org.flickyshka.mc.shelfRoulette;
 
+import org.flickyshka.mc.shelfRoulette.util.*;
+import org.flickyshka.mc.shelfRoulette.manager.*;
+import org.flickyshka.mc.shelfRoulette.listener.*;
+import org.flickyshka.mc.shelfRoulette.command.*;
+import org.flickyshka.mc.shelfRoulette.gui.*;
+import org.flickyshka.mc.shelfRoulette.game.*;
+
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,7 +18,7 @@ import java.util.logging.Logger;
 public final class ShelfRoulette extends JavaPlugin {
 
     private static final Logger log = Logger.getLogger("Minecraft");
-    private final Map<Location, RouletteGame> activeGames = new HashMap<>();
+    private final Map<Location, AbstractGame> activeGames = new HashMap<>();
     private final Map<UUID, Double> playerBets = new HashMap<>();
     private EconomyManager economyManager;
     private ConfigManager configManager;
@@ -52,7 +59,7 @@ public final class ShelfRoulette extends JavaPlugin {
             shelvesManager.clearPermanentArrows();
         }
         // Restore all active games' original items to avoid item loss
-        for (RouletteGame game : new java.util.HashSet<>(activeGames.values())) {
+        for (AbstractGame game : new java.util.HashSet<>(activeGames.values())) {
             game.restoreOriginalContents();
         }
         activeGames.clear();
@@ -65,11 +72,11 @@ public final class ShelfRoulette extends JavaPlugin {
         shelvesManager.load();
     }
 
-    public RouletteGame getActiveGameAt(Location loc) {
+    public AbstractGame getActiveGameAt(Location loc) {
         return activeGames.get(loc);
     }
 
-    public Map<Location, RouletteGame> getActiveGames() {
+    public Map<Location, AbstractGame> getActiveGames() {
         return activeGames;
     }
 

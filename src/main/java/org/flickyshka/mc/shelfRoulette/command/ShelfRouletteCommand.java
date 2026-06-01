@@ -1,4 +1,11 @@
-package org.flickyshka.mc.shelfRoulette;
+package org.flickyshka.mc.shelfRoulette.command;
+import org.flickyshka.mc.shelfRoulette.util.*;
+import org.flickyshka.mc.shelfRoulette.manager.*;
+import org.flickyshka.mc.shelfRoulette.listener.*;
+import org.flickyshka.mc.shelfRoulette.command.*;
+import org.flickyshka.mc.shelfRoulette.gui.*;
+import org.flickyshka.mc.shelfRoulette.game.*;
+import org.flickyshka.mc.shelfRoulette.ShelfRoulette;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;

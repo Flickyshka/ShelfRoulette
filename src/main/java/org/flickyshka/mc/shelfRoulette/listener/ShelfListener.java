@@ -1,4 +1,12 @@
-package org.flickyshka.mc.shelfRoulette;
+package org.flickyshka.mc.shelfRoulette.listener;
+
+import org.flickyshka.mc.shelfRoulette.util.*;
+import org.flickyshka.mc.shelfRoulette.manager.*;
+import org.flickyshka.mc.shelfRoulette.listener.*;
+import org.flickyshka.mc.shelfRoulette.command.*;
+import org.flickyshka.mc.shelfRoulette.gui.*;
+import org.flickyshka.mc.shelfRoulette.game.*;
+import org.flickyshka.mc.shelfRoulette.ShelfRoulette;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -60,9 +68,9 @@ public class ShelfListener implements Listener {
                     List<Block> connected = plugin.getShelvesManager().findConnectedShelves(block);
                     
                     // Проверяем, идет ли игра на любой из соединенных полок
-                    RouletteGame activeGame = null;
+                    AbstractGame activeGame = null;
                     for (Block b : connected) {
-                        RouletteGame g = plugin.getActiveGameAt(b.getLocation());
+                        AbstractGame g = plugin.getActiveGameAt(b.getLocation());
                         if (g != null) {
                             activeGame = g;
                             break;
@@ -71,8 +79,6 @@ public class ShelfListener implements Listener {
                     
                     if (activeGame != null) {
                         if (activeGame.isDisplayingResult()) {
-                            // Если игра завершилась и просто показывает результат,
-                            // принудительно восстанавливаем вещи прямо сейчас, чтобы сразу запустить новую!
                             activeGame.restoreOriginalContents();
                         } else {
                             plugin.getConfigManager().sendMessage(player, plugin.getConfigManager().getMessage("game-in-progress"));
@@ -97,7 +103,6 @@ public class ShelfListener implements Listener {
         if (event.getInventory().getHolder() instanceof ShelfRouletteMenuHolder) {
             event.setCancelled(true);
             
-            // Фикс быстрого двойного клика (DOUBLE_CLICK)
             if (event.getClick() == ClickType.DOUBLE_CLICK) {
                 return;
             }
@@ -108,13 +113,12 @@ public class ShelfListener implements Listener {
             
             Player player = (Player) event.getWhoClicked();
             
-            // Защита от спам-кликов в меню (кулдаун 150 мс)
             UUID uuid = player.getUniqueId();
             long now = System.currentTimeMillis();
             if (guiCooldowns.containsKey(uuid)) {
                 long lastClick = guiCooldowns.get(uuid);
                 if (now - lastClick < 150) {
-                    return; // Игнорируем клик, если прошло меньше 150 мс
+                    return;
                 }
             }
             guiCooldowns.put(uuid, now);
@@ -152,7 +156,7 @@ public class ShelfListener implements Listener {
                                     double balance = plugin.getEconomyManager().getBalance(player);
                                     
                                     double newBet = Math.min(currentBet + amount, balance);
-                                    newBet = Math.max(1.0, newBet); // На всякий случай
+                                    newBet = Math.max(1.0, newBet);
                                     
                                     if (newBet > currentBet) {
                                         plugin.setPlayerBet(player.getUniqueId(), newBet);
@@ -167,7 +171,6 @@ public class ShelfListener implements Listener {
                                 try {
                                     double amount = Double.parseDouble(amtStr);
                                     double currentBet = plugin.getPlayerBet(player.getUniqueId());
-                                    // Минимальная ставка - 1.0 монета
                                     double newBet = Math.max(1.0, currentBet - amount);
                                     if (newBet < currentBet) {
                                         plugin.setPlayerBet(player.getUniqueId(), newBet);
@@ -214,8 +217,8 @@ public class ShelfListener implements Listener {
         int maxGames = configManager.getMaxConcurrentGames();
         if (maxGames > 0) {
             int playerGames = 0;
-            java.util.Set<RouletteGame> uniqueGames = new java.util.HashSet<>(plugin.getActiveGames().values());
-            for (RouletteGame active : uniqueGames) {
+            java.util.Set<AbstractGame> uniqueGames = new java.util.HashSet<>(plugin.getActiveGames().values());
+            for (AbstractGame active : uniqueGames) {
                 if (active.getPlayer().getUniqueId().equals(player.getUniqueId())) {
                     playerGames++;
                 }
@@ -230,9 +233,17 @@ public class ShelfListener implements Listener {
                 .replace("{amount_commas}", configManager.formatMoneyCommas(betAmount))
                 .replace("{amount}", configManager.formatMoney(betAmount)));
         
-        // Запуск игры
-        RouletteGame game = new RouletteGame(plugin, player, betAmount, block);
-        for (Block b : game.getShelves()) {
+        String setupName = plugin.getShelvesManager().getSetupName(block.getLocation());
+        ConfigManager.RouletteSetup setup = configManager.getSetup(setupName);
+
+        AbstractGame game;
+        if (setup.getGameMode().equals("SLOT")) {
+            game = new SlotGame(plugin, player, betAmount, block);
+        } else {
+            game = new RouletteGame(plugin, player, betAmount, block);
+        }
+
+        for (Block b : plugin.getShelvesManager().findConnectedShelves(block)) {
             plugin.getActiveGames().put(b.getLocation(), game);
         }
         game.runTaskTimer(plugin, 0, 1);

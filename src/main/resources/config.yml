@@ -1,0 +1,141 @@
+animation-duration: 60-100
+animation-speed-ticks: 2
+result-display-duration: 60
+animation-slowdown: false
+
+default-bet: 10.0
+max-concurrent-games: 2
+money-format: "#.##"
+
+hologram:
+  types:
+    arrows: "TEXT_DISPLAY"
+    idle: "TEXT_DISPLAY"
+    spinning: "TEXT_DISPLAY"
+    win: "TEXT_DISPLAY"
+    lose: "TEXT_DISPLAY"
+  top-arrow: "&f▼"
+  bottom-arrow: "&f▲"
+  offsets:
+    game:
+      x: 0.0
+      y: 1.0
+      z: 0.0
+    # ▼
+    top:
+      x: 0.0
+      y: 0.725
+      z: -0.18
+    # ▲
+    bottom:
+      x: 0.0
+      y: -0.025
+      z: -0.18
+  lines:
+    idle-roulette:
+      - "&#fa3250[♤] Рулетка"
+      - "&#fa3250пᴋм &fдля игры"
+      - "&#fa3250sʜɪꜰᴛ+пᴋм &fдля ставки"
+    idle-slot:
+      - "&#fa3250[♤] Слоты"
+      - "&#fa3250пᴋм &fдля игры"
+      - "&#fa3250sʜɪꜰᴛ+пᴋм &fдля ставки"
+    spinning:
+      - "&#fa3250[♤]"
+      - "%player% <#fac641>✦ %bet_commas%"
+      - "&#fa3250Крутим..."
+    win:
+      - "&#fa3250[♤]"
+      - "%player% <#fac641>✦ %bet_commas%"
+      - "&a&lПОБЕДА! <#fac641>✦ %winnings_commas%"
+    lose:
+      - "&#fa3250[♤]"
+      - "%player% <#fac641>✦ %bet_commas%"
+      - "&c&lПРОИГРЫШ"
+
+sounds:
+  spin:
+    sound: "BLOCK_NOTE_BLOCK_HAT"
+    volume: 1.0
+    pitch: 1.2
+  stop:
+    sound: "BLOCK_NOTE_BLOCK_BELL"
+    volume: 1.0
+    pitch: 1.2
+  win:
+    sound: "ENTITY_PLAYER_LEVELUP"
+    volume: 1.0
+    pitch: 1.0
+  lose:
+    sound: "ENTITY_VILLAGER_NO"
+    volume: 1.0
+    pitch: 0.8
+
+messages:
+  bet-placed: "&#fa3250[♤]&f Игра запущена! Ставка: <#fac641>✦ {amount_commas}"
+  win: "&#fa3250[♤] &aПоздравляем! &fВы выиграли <#fac641>✦ {amount_commas}"
+  lose: "&#fa3250[♤] &cВы проиграли. &fПопробуйте еще раз!"
+  not-enough-money: "&c[✘] &fНедостаточно средств."
+  error-withdraw: "&c[✘] &fОшибка при снятии средств."
+  game-in-progress: "&c[✘] &fПодождите немного..."
+  max-concurrent-games-reached: "&c[✘] &fВы не можете запустить больше 2 игр одновременно!"
+  bet-selected: "&#fa3250[♤] &fРазмер вашей ставки изменен на <#fac641>✦ {amount_commas}"
+  not-registered: "&c[✘] &fЭта полка не является рулеткой!"
+  registered-success: "&#fa3250[♤] &fПолка зарегистрирована как рулетка &a({setup})&f!"
+  unregistered-success: "&#fa3250[♤] &fПолка удалена из списка рулеток!"
+  not-a-shelf: "&c[✘] &fВы должны смотреть на полку!"
+  already-registered: "&c[✘] &fЭта полка уже зарегистрирована!"
+  not-registered-shelf: "&c[✘] &fЭта полка не была зарегистрирована!"
+  no-permission: "&c[✘] &fУ вас нет прав для выполнения этой команды!"
+
+
+roulette-items:
+  NETHERITE_INGOT:
+    multiplier: 20.0
+    weight: 1
+  EMERALD:
+    multiplier: 5.0
+    weight: 3
+  DIAMOND:
+    multiplier: 2.0
+    weight: 5
+  GOLD_INGOT:
+    multiplier: 1.5
+    weight: 10
+  IRON_INGOT:
+    multiplier: 1.2
+    weight: 15
+  COPPER_INGOT:
+    multiplier: 1.0
+    weight: 20
+  CHARCOAL:
+    multiplier: 0.0
+    weight: 50
+
+slot-items:
+  "base64:eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTY5YTdmNTZlMWJmZWIwZDU5ZjU4OWUzNzc0MDZlYTViMWQxYzFkYzFjNDA4Nzk0ZDAzNWY3M2NmODhiNjdmNSJ9fX0=":
+    multiplier: 10.0
+    weight: 1
+  "base64:eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGU3Mzg1ZTliMjI1YzUzMjUyYjk4NzNmZDlmM2M1MjkyY2ZmNTY3NWMzZjY5MzJiMTY3YjBmNjA4NjQxZWUxZiJ9fX0=":
+    multiplier: 5
+    weight: 5
+  "base64:eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzYxNjVhZjg0MmQ3MWRjNTg4MjRjNzZhZjEwNDE2MzE2YTU1YWNlZTVhYzY5YWUxMWE4MWE2NWQ0ZDQ1Mzk2MSJ9fX0=":
+    multiplier: 2.0
+    weight: 10
+  COPPER_INGOT:
+    multiplier: 1.0
+    weight: 20
+
+# Пример использования подтипов и кастомных голов:
+# slot-items:
+#   vip:
+#     DIAMOND:
+#       multiplier: 50.0
+#       weight: 1
+#     "base64:eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzA3ZmNjMDcyYTBiOGFmMWE5OWRhZDMzOGRmMTM4ZGM0OGViYWE5YTk0MmI1YzZhZjQ3MmFkYThmMDFlYzgwMCJ9fX0=":
+#       multiplier: 5.0
+#       weight: 10
+#   default:
+#     GOLD_INGOT:
+#       multiplier: 10.0
+#       weight: 1

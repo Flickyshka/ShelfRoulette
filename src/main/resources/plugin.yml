@@ -1,0 +1,10 @@
+name: ShelfRoulette
+version: '${version}'
+main: org.flickyshka.mc.shelfRoulette.ShelfRoulette
+api-version: '1.21'
+softdepend: [PlaceholderAPI, Vault]
+commands:
+  shelfroulette:
+    description: Управление зарегистрированными деревянными полками-рулетками.
+    aliases: [sr]
+    usage: /<command> [register|unregister|list]

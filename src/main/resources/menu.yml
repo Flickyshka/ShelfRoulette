@@ -1,0 +1,126 @@
+menu_title: '&0Выбор ставки:'
+size: 9
+
+items:
+  'decrease_1000000':
+    material: RED_GLAZED_TERRACOTTA
+    slot: 0
+    display_name: '&c- ✦ 1.000.000'
+    lore:
+      - '&7Нажмите для изменения ставки'
+      - '&f'
+      - '&fСтавка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[-1000000]'
+    shift_click_commands:
+      - '[-10000000]'
+  'decrease_100000':
+    material: RED_CONCRETE
+    slot: 1
+    display_name: '&c- ✦ 100.000'
+    lore:
+      - '&7Нажмите для изменения ставки'
+      - '&f'
+      - '&fСтавка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[-100000]'
+    shift_click_commands:
+      - '[-1000000]'
+  'decrease_1000':
+    material: RED_CONCRETE_POWDER
+    slot: 2
+    display_name: '&c- ✦ 1.000'
+    lore:
+      - '&7Нажмите для изменения ставки'
+      - '&f'
+      - '&fСтавка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[-1000]'
+    shift_click_commands:
+      - '[-10000]'
+  'decrease_1':
+    material: RED_DYE
+    slot: 3
+    display_name: '&c- ✦ 1'
+    lore:
+      - '&7Нажмите для изменения ставки'
+      - '&f'
+      - '&fСтавка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[-1]'
+    shift_click_commands:
+      - '[-10]'
+  'status':
+    material: GOLD_BLOCK
+    slot: 4
+    display_name: '&f'
+    lore:
+      - '&fТекущая ставка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[close]'
+  'increase_1':
+    material: LIME_DYE
+    slot: 5
+    display_name: '&a+ ✦ 1'
+    lore:
+      - '&7Нажмите для изменения ставки'
+      - '&f'
+      - '&fСтавка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[+1]'
+    shift_click_commands:
+      - '[+10]'
+  'increase_1000':
+    material: LIME_CONCRETE_POWDER
+    slot: 6
+    display_name: '&a+ ✦ 1.000'
+    lore:
+      - '&7Нажмите для изменения ставки'
+      - '&f'
+      - '&fСтавка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[+1000]'
+    shift_click_commands:
+      - '[+10000]'
+  'increase_100000':
+    material: LIME_CONCRETE
+    slot: 7
+    display_name: '&a+ ✦ 100.000'
+    lore:
+      - '&7Нажмите для изменения ставки'
+      - '&f'
+      - '&fСтавка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[+100000]'
+    shift_click_commands:
+      - '[+1000000]'
+  'increase_1000000':
+    material: LIME_GLAZED_TERRACOTTA
+    slot: 8
+    display_name: '&a+ ✦ 1.000.000'
+    lore:
+      - '&7Нажмите для изменения ставки'
+      - '&f'
+      - '&fСтавка: <#fac641>✦ %current_bet_commas%'
+      - '&fБаланс: <#fac641>✦ %vault_eco_balance_commas%'
+      - '&f'
+    click_commands:
+      - '[+1000000]'
+    shift_click_commands:
+      - '[+10000000]'

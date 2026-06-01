@@ -202,6 +202,15 @@ public class ShelfListener implements Listener {
         double betAmount = plugin.getPlayerBet(player.getUniqueId());
         ConfigManager configManager = plugin.getConfigManager();
         
+        String setupName = plugin.getShelvesManager().getSetupName(block.getLocation());
+        ConfigManager.RouletteSetup setup = configManager.getSetup(setupName);
+
+        if (betAmount < setup.getMinBet()) {
+            configManager.sendMessage(player, configManager.getMessage("bet-too-small")
+                    .replace("{min_bet}", configManager.formatMoney(setup.getMinBet())));
+            return;
+        }
+        
         EconomyManager economy = plugin.getEconomyManager();
         if (!economy.hasEnough(player, betAmount)) {
             configManager.sendMessage(player, configManager.getMessage("not-enough-money"));
@@ -232,9 +241,6 @@ public class ShelfListener implements Listener {
         configManager.sendMessage(player, configManager.getMessage("bet-placed")
                 .replace("{amount_commas}", configManager.formatMoneyCommas(betAmount))
                 .replace("{amount}", configManager.formatMoney(betAmount)));
-        
-        String setupName = plugin.getShelvesManager().getSetupName(block.getLocation());
-        ConfigManager.RouletteSetup setup = configManager.getSetup(setupName);
 
         AbstractGame game;
         if (setup.getGameMode().equals("SLOT")) {

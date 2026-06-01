@@ -52,6 +52,7 @@ public class ConfigManager {
         private final String gameMode;
         private final List<RouletteItem> rouletteItems = new ArrayList<>();
         private int totalWeight = 0;
+        private double minBet = 1.0;
         private final Random random = new Random();
 
         public RouletteSetup(String name, String gameMode) {
@@ -73,6 +74,14 @@ public class ConfigManager {
 
         public int getTotalWeight() {
             return totalWeight;
+        }
+
+        public double getMinBet() {
+            return minBet;
+        }
+
+        public void setMinBet(double minBet) {
+            this.minBet = minBet;
         }
 
         public void addRouletteItem(RouletteItem item) {
@@ -178,6 +187,10 @@ public class ConfigManager {
                 }
             }
         }
+        
+        if (!messages.containsKey("bet-too-small")) {
+            messages.put("bet-too-small", ColorUtil.format("&cСтавка слишком мала! Минимальная ставка: &e{min_bet}"));
+        }
 
         setups.clear();
         loadSetupsFromSection("roulette-items", "ROULETTE", "default");
@@ -189,6 +202,7 @@ public class ConfigManager {
             ConfigurationSection sec = config.getConfigurationSection(sectionName);
             boolean hasSubTypes = false;
             for (String key : sec.getKeys(false)) {
+                if (key.equalsIgnoreCase("min-bet")) continue;
                 ConfigurationSection child = sec.getConfigurationSection(key);
                 if (child != null && !child.contains("multiplier") && !child.contains("weight")) {
                     hasSubTypes = true;
@@ -198,16 +212,19 @@ public class ConfigManager {
             
             if (hasSubTypes) {
                 for (String typeKey : sec.getKeys(false)) {
+                    if (typeKey.equalsIgnoreCase("min-bet")) continue;
                     ConfigurationSection typeSec = sec.getConfigurationSection(typeKey);
                     if (typeSec != null) {
                         String fullName = defaultName + ":" + typeKey.toLowerCase();
                         RouletteSetup setup = new RouletteSetup(fullName, mode);
+                        setup.setMinBet(typeSec.getDouble("min-bet", 1.0));
                         loadItemsIntoSetup(setup, typeSec);
                         setups.put(fullName, setup);
                     }
                 }
             } else {
                 RouletteSetup setup = new RouletteSetup(defaultName, mode);
+                setup.setMinBet(sec.getDouble("min-bet", 1.0));
                 loadItemsIntoSetup(setup, sec);
                 setups.put(defaultName, setup);
             }
@@ -216,6 +233,7 @@ public class ConfigManager {
 
     private void loadItemsIntoSetup(RouletteSetup setup, ConfigurationSection itemsSection) {
         for (String key : itemsSection.getKeys(false)) {
+            if (key.equalsIgnoreCase("min-bet")) continue;
             try {
                 ItemStack itemStack;
                 if (key.startsWith("base64:")) {

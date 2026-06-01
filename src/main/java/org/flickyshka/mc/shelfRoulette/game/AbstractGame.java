@@ -112,7 +112,9 @@ public abstract class AbstractGame extends BukkitRunnable {
             plugin.getShelvesManager().setIdleHologramVisible(b.getLocation(), true);
         }
         removeHologram();
-        plugin.getActiveGames().remove(casinoBlock.getLocation());
+        for (Block b : shelves) {
+            plugin.getActiveGames().remove(b.getLocation());
+        }
     }
 
     protected abstract void determineResult();
@@ -192,4 +194,5 @@ public abstract class AbstractGame extends BukkitRunnable {
         hologramLines.clear();
     }
 }
+
 

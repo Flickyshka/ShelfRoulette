@@ -217,11 +217,6 @@ public class ShelfListener implements Listener {
             return;
         }
 
-        if (!economy.withdraw(player, betAmount)) {
-            configManager.sendMessage(player, configManager.getMessage("error-withdraw"));
-            return;
-        }
-
         // Проверка лимита одновременных игр
         int maxGames = configManager.getMaxConcurrentGames();
         if (maxGames > 0) {
@@ -236,6 +231,11 @@ public class ShelfListener implements Listener {
                 configManager.sendMessage(player, configManager.getMessage("max-concurrent-games-reached"));
                 return;
             }
+        }
+
+        if (!economy.withdraw(player, betAmount)) {
+            configManager.sendMessage(player, configManager.getMessage("error-withdraw"));
+            return;
         }
 
         configManager.sendMessage(player, configManager.getMessage("bet-placed")

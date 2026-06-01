@@ -31,6 +31,7 @@ public abstract class AbstractGame extends BukkitRunnable {
     protected final ConfigManager configManager;
 
     protected boolean displayingResult = false;
+    protected boolean restored = false;
     protected ItemStack winningItem = null;
     protected Block middleBlock = null;
     protected final java.util.List<org.bukkit.entity.Entity> hologramLines = new java.util.ArrayList<>();
@@ -102,7 +103,9 @@ public abstract class AbstractGame extends BukkitRunnable {
         inventories.get(shelfIndex).setItem(localSlot, item);
     }
 
-    public void restoreOriginalContents() {
+    public synchronized void restoreOriginalContents() {
+        if (restored) return;
+        restored = true;
         for (int i = 0; i < shelves.size(); i++) {
             if (inventories.size() > i) {
                 inventories.get(i).setContents(originalContents[i]);
@@ -194,5 +197,6 @@ public abstract class AbstractGame extends BukkitRunnable {
         hologramLines.clear();
     }
 }
+
 
 

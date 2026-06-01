@@ -47,8 +47,6 @@ public class RouletteGame extends AbstractGame {
             int wheelIndex = (wheelOffset + slot) % rouletteWheel.size();
             setItemAt(slot, rouletteWheel.get(wheelIndex));
         }
-
-        this.runTaskTimer(plugin, 1L, 1L);
     }
 
     @Override

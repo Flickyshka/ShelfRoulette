@@ -36,8 +36,6 @@ public class SlotGame extends AbstractGame {
                 setItemAt(slot, randomItem);
             }
         }
-
-        this.runTaskTimer(plugin, 1L, 1L);
     }
 
     @Override

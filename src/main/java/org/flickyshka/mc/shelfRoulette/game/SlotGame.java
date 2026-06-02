@@ -10,6 +10,8 @@ public class SlotGame extends AbstractGame {
 
     private int totalSlots;
     private int[] slotStopTicks;
+    private java.util.List<ItemStack>[] reels;
+    private int[] reelIndices;
 
     public SlotGame(ShelfRoulette plugin, Player player, double betAmount, Block casinoBlock) {
         super(plugin, player, betAmount, casinoBlock);
@@ -20,6 +22,9 @@ public class SlotGame extends AbstractGame {
     protected void initializeGame() {
         totalSlots = shelves.size() * 3;
         slotStopTicks = new int[totalSlots];
+        
+        reels = new java.util.List[totalSlots];
+        reelIndices = new int[totalSlots];
 
         int spinPart = duration / 2;
         int stopPart = duration - spinPart;
@@ -32,9 +37,31 @@ public class SlotGame extends AbstractGame {
             }
             slotStopTicks[slot] = stopTick;
             
-            ItemStack randomItem = setup.getRandomItem();
-            if (randomItem != null) {
-                setItemAt(slot, randomItem);
+            reels[slot] = new java.util.ArrayList<>();
+            ItemStack lastItem = null;
+            int reelSize = 40; // Length of the physical reel
+            for (int i = 0; i < reelSize; i++) {
+                ItemStack nextItem = setup.getRandomItem();
+                int attempts = 0;
+                while (nextItem != null && attempts < 20) {
+                    boolean conflict = (lastItem != null && nextItem.isSimilar(lastItem));
+                    // Prevent same item wrapping around the reel
+                    if (i == reelSize - 1 && !reels[slot].isEmpty() && nextItem.isSimilar(reels[slot].get(0))) {
+                        conflict = true;
+                    }
+                    if (!conflict) break;
+                    nextItem = setup.getRandomItem();
+                    attempts++;
+                }
+                if (nextItem != null) {
+                    reels[slot].add(nextItem);
+                    lastItem = nextItem;
+                }
+            }
+            reelIndices[slot] = random.nextInt(Math.max(1, reels[slot].size()));
+            
+            if (!reels[slot].isEmpty()) {
+                setItemAt(slot, reels[slot].get(reelIndices[slot]));
             }
         }
 
@@ -78,19 +105,9 @@ public class SlotGame extends AbstractGame {
             
             for (int slot = 0; slot < totalSlots; slot++) {
                 if (totalTicksPassed < slotStopTicks[slot]) {
-                    ItemStack currentItem = getItemAt(slot);
-                    ItemStack randomItem = setup.getRandomItem();
-                    
-                    boolean isLastTick = (totalTicksPassed + delay >= slotStopTicks[slot]);
-                    if (!isLastTick) {
-                        int attempts = 0;
-                        while (randomItem != null && currentItem != null && randomItem.isSimilar(currentItem) && attempts < 10) {
-                            randomItem = setup.getRandomItem();
-                            attempts++;
-                        }
-                    }
-                    if (randomItem != null) {
-                        setItemAt(slot, randomItem);
+                    if (!reels[slot].isEmpty()) {
+                        reelIndices[slot] = (reelIndices[slot] + 1) % reels[slot].size();
+                        setItemAt(slot, reels[slot].get(reelIndices[slot]));
                     }
                 }
             }

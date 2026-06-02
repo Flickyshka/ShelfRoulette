@@ -80,6 +80,7 @@ messages:
   game-in-progress: "&c[✘] &fПодождите немного..."
   max-concurrent-games-reached: "&c[✘] &fВы не можете запустить больше 2 игр одновременно!"
   bet-selected: "&#fa3250[♤] &fРазмер вашей ставки изменен на <#fac641>✦ {amount_commas}"
+  bet-too-small: "&c[✘] &fСтавка слишком мала! Минимальная ставка: &e{min_bet}"
   not-registered: "&c[✘] &fЭта полка не является рулеткой!"
   registered-success: "&#fa3250[♤] &fПолка зарегистрирована как рулетка &a({setup})&f!"
   unregistered-success: "&#fa3250[♤] &fПолка удалена из списка рулеток!"

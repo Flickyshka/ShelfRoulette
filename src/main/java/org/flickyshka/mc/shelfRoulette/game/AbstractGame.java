@@ -134,11 +134,32 @@ public abstract class AbstractGame extends BukkitRunnable {
 
         double multiplier = setup.getMultiplier(winningItem);
         double winAmount = betAmount * multiplier;
+        java.util.List<String> commands = setup.getCommands(winningItem);
 
-        if (winAmount > 0) {
+        if (winAmount > 0 || !commands.isEmpty()) {
             if (configManager.isWinEnabled()) spawnHologram(configManager.getHologramWinLines(player, betAmount, winAmount), "win");
-            plugin.getEconomyManager().deposit(player, winAmount);
+            if (winAmount > 0) {
+                plugin.getEconomyManager().deposit(player, winAmount);
+            }
             configManager.playSound(middleBlock.getLocation(), "win", "ENTITY_PLAYER_LEVELUP", 1.0f, 1.0f);
+            
+            for (String cmd : commands) {
+                String formattedCmd = cmd.replace("{player}", player.getName())
+                                         .replace("{amount}", String.valueOf(winAmount))
+                                         .replace("{bet}", String.valueOf(betAmount));
+                
+                final String finalCmd = formattedCmd;
+                org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                    if (finalCmd.startsWith("[message] ")) {
+                        player.sendMessage(org.flickyshka.mc.shelfRoulette.util.ColorUtil.format(player, finalCmd.substring(10)));
+                    } else if (finalCmd.startsWith("[broadcast] ")) {
+                        org.bukkit.Bukkit.broadcastMessage(org.flickyshka.mc.shelfRoulette.util.ColorUtil.format(player, finalCmd.substring(12)));
+                    } else {
+                        org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), finalCmd);
+                    }
+                });
+            }
+            
             String winMsg = configManager.getMessage("win").replace("{amount}", configManager.formatMoney(winAmount)).replace("{amount_commas}", configManager.formatMoneyCommas(winAmount));
             player.sendMessage(org.flickyshka.mc.shelfRoulette.util.ColorUtil.format(player, winMsg));
         } else {

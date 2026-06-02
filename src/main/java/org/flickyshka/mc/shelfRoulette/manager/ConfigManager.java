@@ -27,11 +27,13 @@ public class ConfigManager {
         private final ItemStack item;
         private final double multiplier;
         private final int weight;
+        private final List<String> commands;
 
-        public RouletteItem(ItemStack item, double multiplier, int weight) {
+        public RouletteItem(ItemStack item, double multiplier, int weight, List<String> commands) {
             this.item = item;
             this.multiplier = multiplier;
             this.weight = weight;
+            this.commands = commands != null ? commands : new ArrayList<>();
         }
 
         public ItemStack getItem() {
@@ -44,6 +46,10 @@ public class ConfigManager {
 
         public int getWeight() {
             return weight;
+        }
+
+        public List<String> getCommands() {
+            return commands;
         }
     }
 
@@ -118,6 +124,21 @@ public class ConfigManager {
                 }
             }
             return 0.0;
+        }
+
+        public List<String> getCommands(ItemStack itemStack) {
+            if (itemStack == null) return new ArrayList<>();
+            for (RouletteItem rItem : rouletteItems) {
+                if (rItem.getItem().isSimilar(itemStack)) {
+                    return rItem.getCommands();
+                }
+            }
+            for (RouletteItem rItem : rouletteItems) {
+                if (rItem.getItem().getType() == itemStack.getType() && itemStack.getType() != Material.PLAYER_HEAD) {
+                    return rItem.getCommands();
+                }
+            }
+            return new ArrayList<>();
         }
     }
 
@@ -244,22 +265,23 @@ public class ConfigManager {
                 }
                 
                 double multiplier;
-                int weight;
+                int weight = 1;
+                List<String> commands = new ArrayList<>();
                 
                 if (itemsSection.isConfigurationSection(key)) {
                     ConfigurationSection itemConfig = itemsSection.getConfigurationSection(key);
                     multiplier = itemConfig.getDouble("multiplier", 1.0);
                     weight = itemConfig.getInt("weight", 1);
+                    commands = itemConfig.getStringList("commands");
                 } else {
                     multiplier = itemsSection.getDouble(key);
-                    weight = 10;
                 }
                 
                 if (weight <= 0) {
                     weight = 1;
                 }
                 
-                setup.addRouletteItem(new RouletteItem(itemStack, multiplier, weight));
+                setup.addRouletteItem(new RouletteItem(itemStack, multiplier, weight, commands));
             } catch (Exception e) {
                 plugin.getLogger().warning("Неверный материал или ошибка base64 в config.yml: " + key);
             }

@@ -145,8 +145,10 @@ public abstract class AbstractGame extends BukkitRunnable {
             
             for (String cmd : commands) {
                 String formattedCmd = cmd.replace("{player}", player.getName())
-                                         .replace("{amount}", String.valueOf(winAmount))
-                                         .replace("{bet}", String.valueOf(betAmount));
+                                         .replace("{amount}", configManager.formatMoney(winAmount))
+                                         .replace("{amount_commas}", configManager.formatMoneyCommas(winAmount))
+                                         .replace("{bet}", configManager.formatMoney(betAmount))
+                                         .replace("{bet_commas}", configManager.formatMoneyCommas(betAmount));
                 
                 final String finalCmd = formattedCmd;
                 org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {

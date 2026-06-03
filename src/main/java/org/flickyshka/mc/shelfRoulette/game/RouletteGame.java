@@ -43,6 +43,16 @@ public class RouletteGame extends AbstractGame {
             rouletteWheel.addAll(baseWheel);
         }
 
+        if (configManager.isStartFromLastPosition()) {
+            wheelOffset = 0;
+            for (int slot = 0; slot < totalSlots; slot++) {
+                ItemStack startingItem = originalContents[slot / 3][slot % 3];
+                if (startingItem != null && !startingItem.getType().isAir()) {
+                    rouletteWheel.set(slot, startingItem.clone());
+                }
+            }
+        }
+
         // Initialize display
         for (int slot = 0; slot < totalSlots; slot++) {
             int wheelIndex = (wheelOffset + slot) % rouletteWheel.size();

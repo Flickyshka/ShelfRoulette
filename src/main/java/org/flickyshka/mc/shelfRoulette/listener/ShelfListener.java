@@ -155,10 +155,13 @@ public class ShelfListener implements Listener {
                                     double currentBet = plugin.getPlayerBet(player.getUniqueId());
                                     double balance = plugin.getEconomyManager().getBalance(player);
                                     
-                                    double newBet = Math.min(currentBet + amount, balance);
+                                    double newBet = currentBet + amount;
+                                    if (newBet > balance) {
+                                        newBet = balance;
+                                    }
                                     newBet = Math.max(1.0, newBet);
                                     
-                                    if (newBet > currentBet) {
+                                    if (newBet != currentBet) {
                                         plugin.setPlayerBet(player.getUniqueId(), newBet);
                                         refresh = true;
                                         plugin.getConfigManager().playSound(player, "click", "UI_BUTTON_CLICK", 1.0f, 1.2f);
@@ -171,8 +174,14 @@ public class ShelfListener implements Listener {
                                 try {
                                     double amount = Double.parseDouble(amtStr);
                                     double currentBet = plugin.getPlayerBet(player.getUniqueId());
-                                    double newBet = Math.max(1.0, currentBet - amount);
-                                    if (newBet < currentBet) {
+                                    double balance = plugin.getEconomyManager().getBalance(player);
+                                    double newBet = currentBet - amount;
+                                    if (newBet > balance) {
+                                        newBet = balance;
+                                    }
+                                    newBet = Math.max(1.0, newBet);
+                                    
+                                    if (newBet != currentBet) {
                                         plugin.setPlayerBet(player.getUniqueId(), newBet);
                                         refresh = true;
                                         plugin.getConfigManager().playSound(player, "click", "UI_BUTTON_CLICK", 1.0f, 0.8f);

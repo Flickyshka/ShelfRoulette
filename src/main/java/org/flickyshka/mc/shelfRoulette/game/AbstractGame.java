@@ -106,9 +106,11 @@ public abstract class AbstractGame extends BukkitRunnable {
     public synchronized void restoreOriginalContents() {
         if (restored) return;
         restored = true;
-        for (int i = 0; i < shelves.size(); i++) {
-            if (inventories.size() > i) {
-                inventories.get(i).setContents(originalContents[i]);
+        if (!configManager.isStartFromLastPosition() || !displayingResult) {
+            for (int i = 0; i < shelves.size(); i++) {
+                if (inventories.size() > i) {
+                    inventories.get(i).setContents(originalContents[i]);
+                }
             }
         }
         for (Block b : shelves) {

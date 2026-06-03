@@ -328,6 +328,10 @@ public class ConfigManager {
         return config.getBoolean("animation-slowdown", true);
     }
 
+    public boolean isStartFromLastPosition() {
+        return config.getBoolean("start-from-last-position", true);
+    }
+
     public int getResultDisplayDuration() {
         return resultDisplayDuration;
     }

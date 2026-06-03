@@ -58,7 +58,16 @@ public class SlotGame extends AbstractGame {
                     lastItem = nextItem;
                 }
             }
-            reelIndices[slot] = random.nextInt(Math.max(1, reels[slot].size()));
+            ItemStack startingItem = null;
+            if (configManager.isStartFromLastPosition()) {
+                startingItem = originalContents[slot / 3][slot % 3];
+            }
+            if (startingItem != null && !startingItem.getType().isAir()) {
+                reels[slot].add(0, startingItem.clone());
+                reelIndices[slot] = 0;
+            } else {
+                reelIndices[slot] = random.nextInt(Math.max(1, reels[slot].size()));
+            }
             
             if (!reels[slot].isEmpty()) {
                 setItemAt(slot, reels[slot].get(reelIndices[slot]));

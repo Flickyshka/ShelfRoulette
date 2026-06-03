@@ -16,7 +16,7 @@ public class ShelfRouletteExpansion extends PlaceholderExpansion {
         this.plugin = plugin;
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
         symbols.setGroupingSeparator(',');
-        this.formatter = new DecimalFormat("#,##0.00", symbols);
+        this.formatter = new DecimalFormat("#,##0", symbols);
     }
 
     @Override
@@ -42,10 +42,10 @@ public class ShelfRouletteExpansion extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, String params) {
         if (params.equalsIgnoreCase("money_taken")) {
-            return String.format(Locale.US, "%.2f", plugin.getStatsManager().getMoneyTaken());
+            return String.format(Locale.US, "%.0f", plugin.getStatsManager().getMoneyTaken());
         }
         if (params.equalsIgnoreCase("money_given")) {
-            return String.format(Locale.US, "%.2f", plugin.getStatsManager().getMoneyGiven());
+            return String.format(Locale.US, "%.0f", plugin.getStatsManager().getMoneyGiven());
         }
         if (params.equalsIgnoreCase("money_taken_formatted")) {
             return formatter.format(plugin.getStatsManager().getMoneyTaken());

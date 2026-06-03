@@ -246,6 +246,7 @@ public class ShelfListener implements Listener {
             configManager.sendMessage(player, configManager.getMessage("error-withdraw"));
             return;
         }
+        plugin.getStatsManager().addMoneyTaken(betAmount);
 
         configManager.sendMessage(player, configManager.getMessage("bet-placed")
                 .replace("{amount_commas}", configManager.formatMoneyCommas(betAmount))

@@ -142,6 +142,7 @@ public abstract class AbstractGame extends BukkitRunnable {
             if (configManager.isWinEnabled()) spawnHologram(configManager.getHologramWinLines(player, betAmount, winAmount), "win");
             if (winAmount > 0) {
                 plugin.getEconomyManager().deposit(player, winAmount);
+                plugin.getStatsManager().addMoneyGiven(winAmount);
             }
             configManager.playSound(middleBlock.getLocation(), "win", "ENTITY_PLAYER_LEVELUP", 1.0f, 1.0f);
             

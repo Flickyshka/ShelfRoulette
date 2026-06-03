@@ -6,7 +6,9 @@ import org.flickyshka.mc.shelfRoulette.listener.*;
 import org.flickyshka.mc.shelfRoulette.command.*;
 import org.flickyshka.mc.shelfRoulette.gui.*;
 import org.flickyshka.mc.shelfRoulette.game.*;
+import org.flickyshka.mc.shelfRoulette.placeholder.ShelfRouletteExpansion;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +27,7 @@ public final class ShelfRoulette extends JavaPlugin {
     private ConfigManager configManager;
     private ShelvesManager shelvesManager;
     private MenuManager menuManager;
+    private StatsManager statsManager;
 
     @Override
     public void onEnable() {
@@ -37,12 +40,20 @@ public final class ShelfRoulette extends JavaPlugin {
         // Setup Menu
         menuManager = new MenuManager(this);
         
+        // Setup Stats
+        statsManager = new StatsManager(this);
+        
         // Setup Economy
         economyManager = new EconomyManager();
         if (!economyManager.setupEconomy()) {
             log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+        
+        // Register PlaceholderAPI expansion
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new ShelfRouletteExpansion(this).register();
         }
         
         // Register safety listener
@@ -91,6 +102,10 @@ public final class ShelfRoulette extends JavaPlugin {
 
     public EconomyManager getEconomyManager() {
         return economyManager;
+    }
+    
+    public StatsManager getStatsManager() {
+        return statsManager;
     }
     
     public ConfigManager getConfigManager() {

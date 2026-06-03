@@ -23,34 +23,49 @@ public class RouletteGame extends AbstractGame {
 
     @Override
     protected void initializeGame() {
-        List<ItemStack> baseWheel = new ArrayList<>();
-        for (ConfigManager.RouletteItem rItem : setup.getRouletteItems()) {
-            for (int i = 0; i < rItem.getWeight(); i++) {
-                baseWheel.add(rItem.getItem());
-            }
-        }
-        if (baseWheel.isEmpty()) {
-            ItemStack fallback = setup.getRandomItem();
-            if (fallback != null) baseWheel.add(fallback);
-        }
-        
-        java.util.Collections.shuffle(baseWheel);
-
+        GameState state = plugin.getSavedState(casinoBlock.getLocation());
         totalSlots = shelves.size() * 3;
-        int targetSize = totalSlots * 3;
         
-        while (rouletteWheel.size() < targetSize) {
-            rouletteWheel.addAll(baseWheel);
-        }
+        int randomizeInterval = configManager.getRandomizeEverySpins();
+        boolean reuseState = (state.rouletteWheel != null && state.spinCount < randomizeInterval && configManager.isStartFromLastPosition());
 
-        if (configManager.isStartFromLastPosition()) {
-            wheelOffset = 0;
-            for (int slot = 0; slot < totalSlots; slot++) {
-                ItemStack startingItem = originalContents[slot / 3][slot % 3];
-                if (startingItem != null && !startingItem.getType().isAir()) {
-                    rouletteWheel.set(slot, startingItem.clone());
+        if (reuseState) {
+            this.rouletteWheel.addAll(state.rouletteWheel);
+            this.wheelOffset = state.wheelOffset;
+            state.spinCount++;
+        } else {
+            List<ItemStack> baseWheel = new ArrayList<>();
+            for (ConfigManager.RouletteItem rItem : setup.getRouletteItems()) {
+                for (int i = 0; i < rItem.getWeight(); i++) {
+                    baseWheel.add(rItem.getItem());
                 }
             }
+            if (baseWheel.isEmpty()) {
+                ItemStack fallback = setup.getRandomItem();
+                if (fallback != null) baseWheel.add(fallback);
+            }
+            
+            java.util.Collections.shuffle(baseWheel);
+    
+            int targetSize = totalSlots * 3;
+            
+            while (rouletteWheel.size() < targetSize) {
+                rouletteWheel.addAll(baseWheel);
+            }
+    
+            if (configManager.isStartFromLastPosition()) {
+                wheelOffset = 0;
+                for (int slot = 0; slot < totalSlots; slot++) {
+                    ItemStack startingItem = originalContents[slot / 3][slot % 3];
+                    if (startingItem != null && !startingItem.getType().isAir()) {
+                        rouletteWheel.set(slot, startingItem.clone());
+                    }
+                }
+            }
+            
+            state.rouletteWheel = new ArrayList<>(this.rouletteWheel);
+            state.wheelOffset = this.wheelOffset;
+            state.spinCount = 1;
         }
 
         // Initialize display
@@ -86,6 +101,7 @@ public class RouletteGame extends AbstractGame {
                     int wheelIndex = (wheelOffset + slot) % rouletteWheel.size();
                     setItemAt(slot, rouletteWheel.get(wheelIndex));
                 }
+                plugin.getSavedState(casinoBlock.getLocation()).wheelOffset = wheelOffset;
             }
 
             int delay = configManager.getAnimationSpeedTicks();

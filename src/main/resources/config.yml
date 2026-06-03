@@ -3,6 +3,7 @@ animation-speed-ticks: 2
 result-display-duration: 60
 animation-slowdown: false
 start-from-last-position: true
+randomize-every-spins: 10
 
 default-bet: 10.0
 max-concurrent-games: 2

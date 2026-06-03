@@ -332,6 +332,10 @@ public class ConfigManager {
         return config.getBoolean("start-from-last-position", true);
     }
 
+    public int getRandomizeEverySpins() {
+        return config.getInt("randomize-every-spins", 10);
+    }
+
     public int getResultDisplayDuration() {
         return resultDisplayDuration;
     }

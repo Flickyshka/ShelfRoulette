@@ -20,6 +20,7 @@ public final class ShelfRoulette extends JavaPlugin {
     private static final Logger log = Logger.getLogger("Minecraft");
     private final Map<Location, AbstractGame> activeGames = new HashMap<>();
     private final Map<UUID, Double> playerBets = new HashMap<>();
+    private final Map<Location, GameState> savedStates = new HashMap<>();
     private EconomyManager economyManager;
     private ConfigManager configManager;
     private ShelvesManager shelvesManager;
@@ -78,6 +79,14 @@ public final class ShelfRoulette extends JavaPlugin {
 
     public Map<Location, AbstractGame> getActiveGames() {
         return activeGames;
+    }
+
+    public GameState getSavedState(Location loc) {
+        return savedStates.computeIfAbsent(loc, k -> new GameState());
+    }
+
+    public void clearSavedState(Location loc) {
+        savedStates.remove(loc);
     }
 
     public EconomyManager getEconomyManager() {

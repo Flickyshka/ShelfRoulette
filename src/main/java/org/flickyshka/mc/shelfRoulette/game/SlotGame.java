@@ -20,57 +20,89 @@ public class SlotGame extends AbstractGame {
 
     @Override
     protected void initializeGame() {
+        GameState state = plugin.getSavedState(casinoBlock.getLocation());
         totalSlots = shelves.size() * 3;
         slotStopTicks = new int[totalSlots];
         
         reels = new java.util.List[totalSlots];
         reelIndices = new int[totalSlots];
 
+        int randomizeInterval = configManager.getRandomizeEverySpins();
+        boolean reuseState = (state.reels != null && state.reels.length == totalSlots && state.spinCount < randomizeInterval && configManager.isStartFromLastPosition());
+
         int spinPart = duration / 2;
         int stopPart = duration - spinPart;
-        for (int slot = 0; slot < totalSlots; slot++) {
-            int randomJitter = -5 + random.nextInt(11);
-            int baseStop = spinPart + (stopPart / totalSlots) * (slot + 1);
-            int stopTick = Math.min(duration, Math.max(spinPart, baseStop + randomJitter));
-            if (slot == totalSlots - 1) {
-                stopTick = duration;
+
+        if (reuseState) {
+            state.spinCount++;
+            for (int slot = 0; slot < totalSlots; slot++) {
+                reels[slot] = new java.util.ArrayList<>(state.reels[slot]);
+                reelIndices[slot] = state.reelIndices[slot];
+                
+                int randomJitter = -5 + random.nextInt(11);
+                int baseStop = spinPart + (stopPart / totalSlots) * (slot + 1);
+                int stopTick = Math.min(duration, Math.max(spinPart, baseStop + randomJitter));
+                if (slot == totalSlots - 1) {
+                    stopTick = duration;
+                }
+                slotStopTicks[slot] = stopTick;
+                
+                if (!reels[slot].isEmpty()) {
+                    setItemAt(slot, reels[slot].get(reelIndices[slot]));
+                }
             }
-            slotStopTicks[slot] = stopTick;
+        } else {
+            state.spinCount = 1;
+            state.reels = new java.util.List[totalSlots];
+            state.reelIndices = new int[totalSlots];
             
-            reels[slot] = new java.util.ArrayList<>();
-            ItemStack lastItem = null;
-            int reelSize = 40; // Length of the physical reel
-            for (int i = 0; i < reelSize; i++) {
-                ItemStack nextItem = setup.getRandomItem();
-                int attempts = 0;
-                while (nextItem != null && attempts < 20) {
-                    boolean conflict = (lastItem != null && nextItem.isSimilar(lastItem));
-                    // Prevent same item wrapping around the reel
-                    if (i == reelSize - 1 && !reels[slot].isEmpty() && nextItem.isSimilar(reels[slot].get(0))) {
-                        conflict = true;
+            for (int slot = 0; slot < totalSlots; slot++) {
+                int randomJitter = -5 + random.nextInt(11);
+                int baseStop = spinPart + (stopPart / totalSlots) * (slot + 1);
+                int stopTick = Math.min(duration, Math.max(spinPart, baseStop + randomJitter));
+                if (slot == totalSlots - 1) {
+                    stopTick = duration;
+                }
+                slotStopTicks[slot] = stopTick;
+                
+                reels[slot] = new java.util.ArrayList<>();
+                ItemStack lastItem = null;
+                int reelSize = 40; // Length of the physical reel
+                for (int i = 0; i < reelSize; i++) {
+                    ItemStack nextItem = setup.getRandomItem();
+                    int attempts = 0;
+                    while (nextItem != null && attempts < 20) {
+                        boolean conflict = (lastItem != null && nextItem.isSimilar(lastItem));
+                        // Prevent same item wrapping around the reel
+                        if (i == reelSize - 1 && !reels[slot].isEmpty() && nextItem.isSimilar(reels[slot].get(0))) {
+                            conflict = true;
+                        }
+                        if (!conflict) break;
+                        nextItem = setup.getRandomItem();
+                        attempts++;
                     }
-                    if (!conflict) break;
-                    nextItem = setup.getRandomItem();
-                    attempts++;
+                    if (nextItem != null) {
+                        reels[slot].add(nextItem);
+                        lastItem = nextItem;
+                    }
                 }
-                if (nextItem != null) {
-                    reels[slot].add(nextItem);
-                    lastItem = nextItem;
+                ItemStack startingItem = null;
+                if (configManager.isStartFromLastPosition()) {
+                    startingItem = originalContents[slot / 3][slot % 3];
                 }
-            }
-            ItemStack startingItem = null;
-            if (configManager.isStartFromLastPosition()) {
-                startingItem = originalContents[slot / 3][slot % 3];
-            }
-            if (startingItem != null && !startingItem.getType().isAir()) {
-                reels[slot].add(0, startingItem.clone());
-                reelIndices[slot] = 0;
-            } else {
-                reelIndices[slot] = random.nextInt(Math.max(1, reels[slot].size()));
-            }
-            
-            if (!reels[slot].isEmpty()) {
-                setItemAt(slot, reels[slot].get(reelIndices[slot]));
+                if (startingItem != null && !startingItem.getType().isAir()) {
+                    reels[slot].add(0, startingItem.clone());
+                    reelIndices[slot] = 0;
+                } else {
+                    reelIndices[slot] = random.nextInt(Math.max(1, reels[slot].size()));
+                }
+                
+                state.reels[slot] = new java.util.ArrayList<>(reels[slot]);
+                state.reelIndices[slot] = reelIndices[slot];
+                
+                if (!reels[slot].isEmpty()) {
+                    setItemAt(slot, reels[slot].get(reelIndices[slot]));
+                }
             }
         }
 
@@ -117,6 +149,7 @@ public class SlotGame extends AbstractGame {
                     if (!reels[slot].isEmpty()) {
                         reelIndices[slot] = (reelIndices[slot] + 1) % reels[slot].size();
                         setItemAt(slot, reels[slot].get(reelIndices[slot]));
+                        plugin.getSavedState(casinoBlock.getLocation()).reelIndices[slot] = reelIndices[slot];
                     }
                 }
             }
